@@ -33,13 +33,15 @@ TimerWidget::TimerWidget(QWidget *parent, Timer timerObj) : QWidget(parent)
     this->playButton = new QPushButton;
     this->playButton->setCheckable(true);
     this->playButton->setIcon(QIcon("imgs/play_button.png"));
+    this->playButton->setIconSize(QSize(56, 56));
 
     this->resetButton = new QPushButton;
     this->resetButton->setIcon(QIcon("imgs/reset_button.png"));
-
+    this->resetButton->setIconSize(QSize(56, 56));
     QHBoxLayout *buttonLayout = new QHBoxLayout;
-    buttonLayout->addWidget(this->playButton);
+    buttonLayout->addWidget(this->playButton, 0, Qt::AlignRight);
     buttonLayout->addWidget(this->resetButton);
+    buttonLayout->addWidget(this->resetButton, 0, Qt::AlignLeft);
 
     // timer label itself
     this->timerDurationLabel = new QLabel;
@@ -50,6 +52,11 @@ TimerWidget::TimerWidget(QWidget *parent, Timer timerObj) : QWidget(parent)
     layout->addWidget(this->timerDurationLabel);
     layout->addLayout(buttonLayout);
     setLayout(layout);
+
+    this->resetButton->show();
+    this->deleteButton->show();
+    this->timerDurationLabel->show();
+    timerNameLabel->show();
 }
 
 QString TimerWidget::secondsToQString(int seconds) {

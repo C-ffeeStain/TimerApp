@@ -18,8 +18,11 @@ public:
 
     void extracted(std::ofstream &output);
     bool saveToFile();
+    bool loadFromFile();
+    void setupFilePath();
 
 private:
+    std::string timersFilePath;
     std::vector<Timer> timers;
     QVBoxLayout *rightLayout;
 

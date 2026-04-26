@@ -112,9 +112,15 @@ color: black;
     <layout class="QHBoxLayout" name="buttons">
      <item alignment="Qt::AlignmentFlag::AlignRight">
       <widget class="QPushButton" name="start">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
-         <width>50</width>
+         <width>0</width>
          <height>0</height>
         </size>
        </property>

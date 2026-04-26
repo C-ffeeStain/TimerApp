@@ -14,6 +14,7 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     // creating the entire UI manually because Qt Creator sucks
+    setupFilePath();
 
     QFormLayout *timerAdditionLayout = new QFormLayout;
 
@@ -42,20 +43,29 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     // Set QWidget as the central layout of the main window
     setCentralWidget(window);
+    loadFromFile();
 }
 
-bool MainWindow::saveToFile() {
+void MainWindow::setupFilePath() {
     std::string filePath;
     try {
         filePath = std::getenv("LOCALAPPDATA");
     } catch (std::exception e) {
-        std::cout << "An error occured trying to save to file.";
-        return false;
+        std::cout << "An error occured trying to set up the file path.";
     }
     filePath += "\\TimerApp";
 
     std::filesystem::create_directory(filePath);
-    std::ofstream output(filePath + "\\timers.txt");
+    if (!std::filesystem::exists(filePath)) {
+        std::ofstream output(filePath + "\\timers.txt");
+        output << "";
+        output.close();
+    }
+    timersFilePath = filePath;
+}
+
+bool MainWindow::saveToFile() {
+    std::ofstream output(timersFilePath + "\\timers.txt");
 
     for (int i = 0; i < timers.size(); ++i) {
         const Timer timer = timers.at(i);
@@ -65,6 +75,25 @@ bool MainWindow::saveToFile() {
         if (i != timers.size() - 1) output << "\n";
     }
     output.close();
+    return true;
+}
+
+bool MainWindow::loadFromFile() {
+    timers.clear();
+
+    std::ifstream input(timersFilePath + "\\timers.txt");
+    std::string curLine;
+    while (!input.eof()) {
+        std::getline(input, curLine, '\n');
+        int splitter_index = curLine.find('|');
+        if (splitter_index == std::string::npos) {
+            std::cout << "Error\n";
+            break;
+        }
+        std::string name = curLine.substr(0, splitter_index);
+        int duration = std::stoi(curLine.substr(splitter_index + 1));
+        timers.push_back(Timer(name, duration));
+    }
     return true;
 }
 
