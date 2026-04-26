@@ -42,8 +42,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     // Set QWidget as the central layout of the main window
     setCentralWidget(window);
-
-    std::cout << "It worked? " << saveToFile();
 }
 
 bool MainWindow::saveToFile() {
