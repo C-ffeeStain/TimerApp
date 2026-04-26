@@ -11,6 +11,8 @@
 #include <filesystem>
 #include <iostream>
 
+const int MAX_COLUMNS = 3;
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     // creating the entire UI manually because Qt Creator sucks
@@ -34,8 +36,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->rightLayout->addLayout(timerAdditionLayout);
     this->rightLayout->addWidget(this->addTimerFormButton);
 
+    this->leftLayout = new QGridLayout;
+
     QHBoxLayout *layout = new QHBoxLayout;
     // layout->addWidget(testLabel);
+    layout->addLayout(leftLayout);
     layout->addLayout(rightLayout);
 
     QWidget *window = new QWidget();
@@ -67,19 +72,22 @@ void MainWindow::setupFilePath() {
 bool MainWindow::saveToFile() {
     std::ofstream output(timersFilePath + "\\timers.txt");
 
-    for (int i = 0; i < timers.size(); ++i) {
-        const Timer timer = timers.at(i);
+    for (int i = 0; i < timerWidgets.size(); ++i) {
+        const Timer timer = timerWidgets.at(i).getTimer();
 
         output << timer.name << "|" << timer.duration;
 
-        if (i != timers.size() - 1) output << "\n";
+        if (i != timerWidgets.size() - 1) output << "\n";
     }
     output.close();
     return true;
 }
 
 bool MainWindow::loadFromFile() {
-    timers.clear();
+    for (int i = 0; i < timerWidgets.size(); ++i) {
+        timerWidgets.at(i).deleteLater();
+    }
+    timerWidgets.clear();
 
     std::ifstream input(timersFilePath + "\\timers.txt");
     std::string curLine;
@@ -91,8 +99,14 @@ bool MainWindow::loadFromFile() {
             break;
         }
         std::string name = curLine.substr(0, splitter_index);
-        int duration = std::stoi(curLine.substr(splitter_index + 1));
-        timers.push_back(Timer(name, duration));
+
+        TimerWidget *w = new TimerWidget(nullptr, Timer(name, std::stoi(curLine.substr(splitter_index + 1))));
+        leftLayout->addWidget(w, curRow, curColumn);
+        ++curColumn;
+        if (curColumn >= MAX_COLUMNS) {
+            ++curRow;
+            curColumn = 0;
+        }
     }
     return true;
 }

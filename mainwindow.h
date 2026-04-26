@@ -5,8 +5,6 @@
 
 #include <QMainWindow>
 #include <QLineEdit>
-#include <QVBoxLayout>
-#include <QPushButton>
 
 class MainWindow : public QMainWindow
 {
@@ -16,14 +14,18 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
-    void extracted(std::ofstream &output);
     bool saveToFile();
     bool loadFromFile();
     void setupFilePath();
 
 private:
     std::string timersFilePath;
-    std::vector<Timer> timers;
+    int curRow = 0;
+    int curColumn = 0;
+
+    std::vector<TimerWidget> timerWidgets;
+
+    QGridLayout *leftLayout;
     QVBoxLayout *rightLayout;
 
     QLineEdit *timerNameEdit;

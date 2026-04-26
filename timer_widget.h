@@ -10,7 +10,9 @@
 
 struct Timer {
     std::string name = "Unnamed";
-    int duration = 30;
+    unsigned int duration = 30;
+    unsigned int timeLeft = 0;
+    bool paused = true;
 
     Timer();
     Timer(std::string name, int duration);
@@ -24,16 +26,15 @@ public:
     explicit TimerWidget(QWidget *parent = nullptr, Timer timerObj = Timer());
     ~TimerWidget() override;
     QString secondsToQString(int seconds);
+    Timer getTimer();
 private:
-    int timerDuration;
-    int timeLeft;
-    bool paused;
+    Timer timer;
 
     QLabel *timerDurationLabel;
     // QProgressBar *timerProgressBar;
 
     QPushButton *deleteButton;
-    QPushButton *playButton;
+    QPushButton *startButton;
     QPushButton *resetButton;
 };
 #endif // TIMER_WIDGET_H

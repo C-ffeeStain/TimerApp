@@ -8,10 +8,13 @@
 Timer::Timer() : name("Unnamed"), duration(30) {};
 Timer::Timer(std::string name, int duration) : name(name), duration(duration) {};
 
+Timer TimerWidget::getTimer() {
+    return timer;
+}
 
 TimerWidget::TimerWidget(QWidget *parent, Timer timerObj) : QWidget(parent)
 {
-    this->timerDuration = timerObj.duration;
+    this->timer = timerObj;
 
     // creating the entire UI manually because Qt Creator sucks
 
@@ -30,22 +33,20 @@ TimerWidget::TimerWidget(QWidget *parent, Timer timerObj) : QWidget(parent)
 
     // button layout
 
-    this->playButton = new QPushButton;
-    this->playButton->setCheckable(true);
-    this->playButton->setIcon(QIcon("imgs/play_button.png"));
-    this->playButton->setIconSize(QSize(56, 56));
+    this->startButton = new QPushButton;
+    this->startButton->setText("Start");
+    this->startButton->setCheckable(true);
 
     this->resetButton = new QPushButton;
-    this->resetButton->setIcon(QIcon("imgs/reset_button.png"));
-    this->resetButton->setIconSize(QSize(56, 56));
+
     QHBoxLayout *buttonLayout = new QHBoxLayout;
-    buttonLayout->addWidget(this->playButton, 0, Qt::AlignRight);
+    buttonLayout->addWidget(this->startButton, 0, Qt::AlignRight);
     buttonLayout->addWidget(this->resetButton);
     buttonLayout->addWidget(this->resetButton, 0, Qt::AlignLeft);
 
     // timer label itself
     this->timerDurationLabel = new QLabel;
-    this->timerDurationLabel->setText(secondsToQString(this->timerDuration));
+    this->timerDurationLabel->setText(secondsToQString(this->timer.duration));
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(headerLayout);
