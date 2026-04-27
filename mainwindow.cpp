@@ -34,21 +34,33 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     timerAdditionLayout->addRow("Timer duration:", this->timerDurationEdit);
 
     this->rightLayout = new QVBoxLayout;
+
+
+    QWidget *rightLayoutWidget = new QWidget;
+    rightLayoutWidget->setLayout(rightLayout);
+    rightLayoutWidget->setMaximumWidth(280);
+
     this->rightLayout->addLayout(timerAdditionLayout);
     this->rightLayout->addWidget(this->addTimerFormButton);
 
     this->leftLayout = new QGridLayout(this);
 
+    QWidget *leftLayoutWidget = new QWidget;
+    leftLayoutWidget->setLayout(leftLayout);
+
     QHBoxLayout *layout = new QHBoxLayout;
     // layout->addWidget(testLabel);
-    layout->addLayout(leftLayout);
-    layout->addLayout(rightLayout);
+    layout->addWidget(leftLayoutWidget);
+    layout->addWidget(rightLayoutWidget);
 
     QWidget *window = new QWidget();
     window->setLayout(layout);
 
     // Set QWidget as the central layout of the main window
     setCentralWidget(window);
+    leftLayoutWidget->setParent(window);
+    rightLayoutWidget->setParent(window);
+
     loadFromFile();
 }
 

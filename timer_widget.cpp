@@ -9,42 +9,6 @@
 Timer::Timer() : name("Unnamed"), duration(30) {};
 Timer::Timer(std::string name, int duration) : name(name), duration(duration) {};
 
-Timer TimerWidget::getTimer() {
-    return timer;
-}
-
-void TimerWidget::startButtonToggled(bool checked) {
-    if (checked) {
-        if (timer.timeLeft == 0) timer.timeLeft = timer.duration;
-
-        startButton->setText("Pause");
-        timer.paused = false;
-        qTimer->start(1000);
-    } else {
-        startButton->setText("Start");
-        qTimer->stop();
-        timer.paused = true;
-    }
-}
-
-void TimerWidget::resetButtonClicked(bool checked) {
-    timer.timeLeft = timer.duration;
-    timerDurationLabel->setText(secondsToQString(timer.timeLeft));
-}
-
-void TimerWidget::tick() {
-    if (timer.paused) return;
-
-    if (timer.timeLeft <= 0) {
-        // TODO: add logic for sending notif
-        qTimer->stop();
-        QMessageBox::information(this, "Timer Done!", "Your timer is done.");
-        return;
-    }
-    --timer.timeLeft;
-    timerDurationLabel->setText(secondsToQString(timer.timeLeft));
-}
-
 TimerWidget::TimerWidget(QWidget *parent, Timer timerObj) : QWidget(parent)
 {
     setMaximumHeight(200);
@@ -59,11 +23,13 @@ TimerWidget::TimerWidget(QWidget *parent, Timer timerObj) : QWidget(parent)
 
     QLabel *timerNameLabel = new QLabel;
     timerNameLabel->setText(QString::fromStdString(timerObj.name));
+    timerNameLabel->setMaximumHeight(25);
 
     deleteButton = new QPushButton;
     deleteButton->setText("X");
     deleteButton->setStyleSheet("QPushButton {border: none; background: transparent;}");
     deleteButton->setMaximumWidth(25);
+    deleteButton->setMaximumHeight(25);
 
     QHBoxLayout *headerLayout = new QHBoxLayout;
     headerLayout->addWidget(timerNameLabel);
@@ -110,3 +76,45 @@ QString TimerWidget::secondsToQString(int seconds) {
 }
 
 TimerWidget::~TimerWidget() = default;
+
+Timer TimerWidget::getTimer() {
+    return timer;
+}
+
+void TimerWidget::startButtonToggled(bool checked) {
+    if (checked) {
+        if (timer.timeLeft == 0) timer.timeLeft = timer.duration;
+
+        startButton->setText("Pause");
+        timer.paused = false;
+        qTimer->start(1000);
+        tick();
+    } else {
+        startButton->setText("Start");
+        qTimer->stop();
+        timer.paused = true;
+    }
+}
+
+void TimerWidget::resetButtonClicked(bool checked) {
+    timer.timeLeft = timer.duration;
+    timerDurationLabel->setText(secondsToQString(timer.timeLeft));
+    if (!timer.paused) {
+        // restart timer to avoid awkward timing with reset
+        qTimer->stop();
+        qTimer->start(1000);
+    }
+}
+
+void TimerWidget::tick() {
+    if (timer.paused) return;
+
+    if (timer.timeLeft <= 0) {
+        // TODO: add logic for sending notif
+        qTimer->stop();
+        QMessageBox::information(this, "Timer Done!", "Your timer is done.");
+        return;
+    }
+    --timer.timeLeft;
+    timerDurationLabel->setText(secondsToQString(timer.timeLeft));
+}
