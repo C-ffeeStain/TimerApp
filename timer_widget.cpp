@@ -4,7 +4,8 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QTime>
-#include <QMessageBox>
+#include <QSystemTrayIcon>
+#include <QMenu>
 
 Timer::Timer() : name("Unnamed"), duration(30) {};
 Timer::Timer(std::string name, int duration) : name(name), duration(duration) {};
@@ -114,9 +115,12 @@ void TimerWidget::tick() {
     if (timer.paused) return;
 
     if (timer.timeLeft <= 0) {
-        // TODO: add logic for sending notif
         qTimer->stop();
-        QMessageBox::information(this, "Timer Done!", "Your timer is done.");
+        QSystemTrayIcon icon(QIcon::fromTheme(QIcon::ThemeIcon::CallStop));
+        QMenu *menu = new QMenu("Timer Finished");
+        icon.setContextMenu(menu);
+        icon.show();
+        icon.showMessage("Timer Finished!", "Your timer has finished.");
         return;
     }
     --timer.timeLeft;
