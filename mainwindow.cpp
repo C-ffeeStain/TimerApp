@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
+#include <QMessageBox>
 #include <QLineEdit>
 #include <QLabel>
 
@@ -36,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->rightLayout->addLayout(timerAdditionLayout);
     this->rightLayout->addWidget(this->addTimerFormButton);
 
-    this->leftLayout = new QGridLayout;
+    this->leftLayout = new QGridLayout(this);
 
     QHBoxLayout *layout = new QHBoxLayout;
     // layout->addWidget(testLabel);
@@ -100,7 +101,7 @@ bool MainWindow::loadFromFile() {
         }
         std::string name = curLine.substr(0, splitter_index);
 
-        TimerWidget *w = new TimerWidget(nullptr, Timer(name, std::stoi(curLine.substr(splitter_index + 1))));
+        TimerWidget *w = new TimerWidget(this, Timer(name, std::stoi(curLine.substr(splitter_index + 1))));
         leftLayout->addWidget(w, curRow, curColumn);
         ++curColumn;
         if (curColumn >= MAX_COLUMNS) {

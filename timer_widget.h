@@ -5,8 +5,8 @@
 #include <QVBoxLayout>
 
 #include <QPushButton>
+#include <QTimer>
 #include <QLabel>
-// #include <QProgressBar>
 
 struct Timer {
     std::string name = "Unnamed";
@@ -29,12 +29,16 @@ public:
     Timer getTimer();
 private:
     Timer timer;
+    QTimer *qTimer;
 
     QLabel *timerDurationLabel;
-    // QProgressBar *timerProgressBar;
 
     QPushButton *deleteButton;
     QPushButton *startButton;
     QPushButton *resetButton;
+
+    void startButtonToggled(bool checked = false);
+    void resetButtonClicked(bool checked = false);
+    void tick();
 };
 #endif // TIMER_WIDGET_H
