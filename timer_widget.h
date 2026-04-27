@@ -23,10 +23,12 @@ class TimerWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit TimerWidget(QWidget *parent = nullptr, Timer timerObj = Timer());
+    explicit TimerWidget(const Timer timer, QWidget *parent = nullptr);
     ~TimerWidget() override;
-    QString secondsToQString(int seconds);
-    Timer getTimer();
+    QString secondsToQString(int seconds) const;
+    Timer getTimer() const;
+signals:
+    void deleteRequested(TimerWidget* toBeDeleted);
 private:
     Timer timer;
     QTimer *qTimer;
@@ -39,6 +41,7 @@ private:
 
     void startButtonToggled(bool checked = false);
     void resetButtonClicked(bool checked = false);
+    void deleteButtonClicked(bool checked = false);
     void tick();
 };
 #endif // TIMER_WIDGET_H

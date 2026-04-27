@@ -9,11 +9,12 @@
 Timer::Timer() : name("Unnamed"), duration(30) {};
 Timer::Timer(std::string name, int duration) : name(name), duration(duration) {};
 
-TimerWidget::TimerWidget(QWidget *parent, Timer timerObj) : QWidget(parent)
+TimerWidget::TimerWidget(const Timer timer, QWidget *parent) : QWidget(parent)
 {
-    setMaximumHeight(200);
+    setMaximumSize(250, 200);
+
     qTimer = new QTimer;
-    timer = timerObj;
+    this->timer = timer;
 
     QTimer::connect(qTimer, &QTimer::timeout, this, &TimerWidget::tick);
 
@@ -22,7 +23,7 @@ TimerWidget::TimerWidget(QWidget *parent, Timer timerObj) : QWidget(parent)
     // "header" layout
 
     QLabel *timerNameLabel = new QLabel;
-    timerNameLabel->setText(QString::fromStdString(timerObj.name));
+    timerNameLabel->setText(QString::fromStdString(timer.name));
     timerNameLabel->setMaximumHeight(25);
 
     deleteButton = new QPushButton;
@@ -30,6 +31,7 @@ TimerWidget::TimerWidget(QWidget *parent, Timer timerObj) : QWidget(parent)
     deleteButton->setStyleSheet("QPushButton {border: none; background: transparent;}");
     deleteButton->setMaximumWidth(25);
     deleteButton->setMaximumHeight(25);
+    QPushButton::connect(deleteButton, &QPushButton::clicked, this, &TimerWidget::deleteButtonClicked);
 
     QHBoxLayout *headerLayout = new QHBoxLayout;
     headerLayout->addWidget(timerNameLabel);
@@ -69,7 +71,7 @@ TimerWidget::TimerWidget(QWidget *parent, Timer timerObj) : QWidget(parent)
     timerNameLabel->show();
 }
 
-QString TimerWidget::secondsToQString(int seconds) {
+QString TimerWidget::secondsToQString(int seconds) const {
     QTime time(0, 0);
     time = time.addSecs(seconds);
     return time.toString("hh:mm:ss");
@@ -77,7 +79,7 @@ QString TimerWidget::secondsToQString(int seconds) {
 
 TimerWidget::~TimerWidget() = default;
 
-Timer TimerWidget::getTimer() {
+Timer TimerWidget::getTimer() const {
     return timer;
 }
 
@@ -105,6 +107,8 @@ void TimerWidget::resetButtonClicked(bool checked) {
         qTimer->start(1000);
     }
 }
+
+void TimerWidget::deleteButtonClicked(bool checked) { emit deleteRequested(this); }
 
 void TimerWidget::tick() {
     if (timer.paused) return;

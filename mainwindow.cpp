@@ -21,40 +21,40 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     QFormLayout *timerAdditionLayout = new QFormLayout;
 
-    this->timerNameEdit = new QLineEdit;
-    this->timerNameEdit->setPlaceholderText("Example timer name");
+    timerNameEdit = new QLineEdit;
+    timerNameEdit->setPlaceholderText("Example timer name");
 
-    this->timerDurationEdit = new QLineEdit;
-    this->timerDurationEdit->setPlaceholderText("01:30:00");
+    timerDurationEdit = new QLineEdit;
+    timerDurationEdit->setPlaceholderText("01:30:00");
 
-    this->addTimerFormButton = new QPushButton;
-    this->addTimerFormButton->setText("Add Timer");
+    addTimerFormButton = new QPushButton;
+    addTimerFormButton->setText("Add Timer");
 
-    timerAdditionLayout->addRow("Timer name:", this->timerNameEdit);
-    timerAdditionLayout->addRow("Timer duration:", this->timerDurationEdit);
+    timerAdditionLayout->addRow("Timer name:", timerNameEdit);
+    timerAdditionLayout->addRow("Timer duration:", timerDurationEdit);
 
-    this->rightLayout = new QVBoxLayout;
+    rightLayout = new QVBoxLayout;
 
 
     QWidget *rightLayoutWidget = new QWidget;
     rightLayoutWidget->setLayout(rightLayout);
     rightLayoutWidget->setMaximumWidth(280);
 
-    this->rightLayout->addLayout(timerAdditionLayout);
-    this->rightLayout->addWidget(this->addTimerFormButton);
+    rightLayout->addLayout(timerAdditionLayout);
+    rightLayout->addWidget(addTimerFormButton);
 
-    this->leftLayout = new QGridLayout(this);
+    leftLayout = new QGridLayout(this);
 
-    QWidget *leftLayoutWidget = new QWidget;
+    leftLayoutWidget = new QWidget;
     leftLayoutWidget->setLayout(leftLayout);
 
-    QHBoxLayout *layout = new QHBoxLayout;
+    mainLayout = new QHBoxLayout;
     // layout->addWidget(testLabel);
-    layout->addWidget(leftLayoutWidget);
-    layout->addWidget(rightLayoutWidget);
+    mainLayout->addWidget(leftLayoutWidget);
+    mainLayout->addWidget(rightLayoutWidget);
 
     QWidget *window = new QWidget();
-    window->setLayout(layout);
+    window->setLayout(mainLayout);
 
     // Set QWidget as the central layout of the main window
     setCentralWidget(window);
@@ -85,22 +85,19 @@ void MainWindow::setupFilePath() {
 bool MainWindow::saveToFile() {
     std::ofstream output(timersFilePath + "\\timers.txt");
 
-    for (int i = 0; i < timerWidgets.size(); ++i) {
-        const Timer timer = timerWidgets.at(i).getTimer();
+    for (int i = 0; i < timers.size(); ++i) {
+        const Timer timer = *timers.at(i);
 
         output << timer.name << "|" << timer.duration;
 
-        if (i != timerWidgets.size() - 1) output << "\n";
+        if (i != timers.size() - 1) output << "\n";
     }
     output.close();
     return true;
 }
 
 bool MainWindow::loadFromFile() {
-    for (int i = 0; i < timerWidgets.size(); ++i) {
-        timerWidgets.at(i).deleteLater();
-    }
-    timerWidgets.clear();
+    timers.clear();
 
     std::ifstream input(timersFilePath + "\\timers.txt");
     std::string curLine;
@@ -113,8 +110,12 @@ bool MainWindow::loadFromFile() {
         }
         std::string name = curLine.substr(0, splitter_index);
 
-        TimerWidget *w = new TimerWidget(this, Timer(name, std::stoi(curLine.substr(splitter_index + 1))));
+        Timer t(name, std::stoi(curLine.substr(splitter_index + 1)));
+        TimerWidget *w = new TimerWidget(t);
+        TimerWidget::connect(w, &TimerWidget::deleteRequested, this, &MainWindow::reorganizeTimerWidgets);
         leftLayout->addWidget(w, curRow, curColumn);
+        timers.push_back(t);
+
         ++curColumn;
         if (curColumn >= MAX_COLUMNS) {
             ++curRow;
@@ -122,6 +123,11 @@ bool MainWindow::loadFromFile() {
         }
     }
     return true;
+}
+
+void MainWindow::reorganizeTimerWidgets(TimerWidget* toBeDeleted) {
+    leftLayout->removeWidget(toBeDeleted);
+    toBeDeleted->deleteLater();
 }
 
 MainWindow::~MainWindow() = default;

@@ -14,17 +14,19 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
+    void setupFilePath();
     bool saveToFile();
     bool loadFromFile();
-    void setupFilePath();
 
 private:
     std::string timersFilePath;
     int curRow = 0;
     int curColumn = 0;
 
-    std::vector<TimerWidget> timerWidgets;
+    std::vector<Timer> timers;
 
+    QHBoxLayout *mainLayout;
+    QWidget *leftLayoutWidget;
     QGridLayout *leftLayout;
     QVBoxLayout *rightLayout;
 
@@ -33,5 +35,7 @@ private:
 
     QPushButton *addTimerButton;
     QPushButton *addTimerFormButton;
+
+    void reorganizeTimerWidgets(TimerWidget* toBeDeleted);
 };
 #endif // MAINWINDOW_H
