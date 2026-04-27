@@ -86,7 +86,7 @@ bool MainWindow::saveToFile() {
     std::ofstream output(timersFilePath + "\\timers.txt");
 
     for (int i = 0; i < timers.size(); ++i) {
-        const Timer timer = *timers.at(i);
+        const Timer timer = timers.at(i);
 
         output << timer.name << "|" << timer.duration;
 
