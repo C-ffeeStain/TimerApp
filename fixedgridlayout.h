@@ -2,29 +2,32 @@
 #define FIXEDGRIDLAYOUT_H
 
 #include <QGridLayout>
+#include "timer_widget.h"
 
-enum LayoutMode {
-    ColumnsFirst,
-    RowsFirst
-};
 
 class FixedGridLayout : public QGridLayout
 {
     Q_OBJECT
 public:
+    enum LayoutMode {
+        ColumnsFirst,
+        RowsFirst
+    };
+
     FixedGridLayout(int maxRows, int maxColumns, LayoutMode layoutMode = LayoutMode::ColumnsFirst, QWidget *parent = nullptr);
 
     int getMaxRows() const;
     int getMaxColumns() const;
-    std::vector<QWidget*> getLayoutChildren();
-    void refresh(QWidget *removedElement = nullptr);
+    std::vector<TimerWidget*> getLayoutChildren();
+    void refresh(TimerWidget *removedElement = nullptr);
 
     LayoutMode getLayoutMode();
     void setLayoutMode(LayoutMode layoutMode);
 
-    void addWidgetToEnd(QWidget* widget);
+    void addWidgetToEnd(TimerWidget* widget);
+    void addWidget(TimerWidget *widget, int row, int column, Qt::Alignment alignment = Qt::Alignment());
 signals:
-    void childDestroyed(QWidget *child);
+    void childDestroyed(TimerWidget *child);
 private:
     LayoutMode layoutMode;
     int currentRow;
@@ -32,7 +35,7 @@ private:
     int maxRows;
     int maxColumns;
 
-    std::vector<QWidget*> layoutChildren;
+    std::vector<TimerWidget*> layoutChildren;
 
     void incrementPosition();
     void onChildDestroyed(QObject* obj);

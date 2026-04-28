@@ -13,6 +13,8 @@ qt_add_executable(TimerApp
     delete.ui
     timer_widget.h
     timer_widget.cpp
+
+
 )
 
 target_link_libraries(TimerApp

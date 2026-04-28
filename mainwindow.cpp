@@ -19,47 +19,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // creating the entire UI manually because Qt Creator sucks
     setupFilePath();
 
-    QFormLayout *timerAdditionLayout = new QFormLayout;
+    mainLayout = new QGridLayout;
 
-    timerNameEdit = new QLineEdit;
-    timerNameEdit->setPlaceholderText("Example timer name");
-
-    timerDurationEdit = new QLineEdit;
-    timerDurationEdit->setPlaceholderText("01:30:00");
-
-    addTimerFormButton = new QPushButton;
-    addTimerFormButton->setText("Add Timer");
-
-    timerAdditionLayout->addRow("Timer name:", timerNameEdit);
-    timerAdditionLayout->addRow("Timer duration:", timerDurationEdit);
-
-    rightLayout = new QVBoxLayout;
-
-
-    QWidget *rightLayoutWidget = new QWidget;
-    rightLayoutWidget->setLayout(rightLayout);
-    rightLayoutWidget->setMaximumWidth(280);
-
-    rightLayout->addLayout(timerAdditionLayout);
-    rightLayout->addWidget(addTimerFormButton);
-
-    leftLayout = new QGridLayout(this);
-
-    leftLayoutWidget = new QWidget;
-    leftLayoutWidget->setLayout(leftLayout);
-
-    mainLayout = new QHBoxLayout;
-    // layout->addWidget(testLabel);
-    mainLayout->addWidget(leftLayoutWidget);
-    mainLayout->addWidget(rightLayoutWidget);
 
     QWidget *window = new QWidget();
     window->setLayout(mainLayout);
 
     // Set QWidget as the central layout of the main window
     setCentralWidget(window);
-    leftLayoutWidget->setParent(window);
-    rightLayoutWidget->setParent(window);
 
     loadFromFile();
 }
@@ -112,8 +79,8 @@ bool MainWindow::loadFromFile() {
 
         Timer t(name, std::stoi(curLine.substr(splitter_index + 1)));
         TimerWidget *w = new TimerWidget(t);
-        TimerWidget::connect(w, &TimerWidget::deleteRequested, this, &MainWindow::reorganizeTimerWidgets);
-        leftLayout->addWidget(w, curRow, curColumn);
+        // TimerWidget::connect(w, &TimerWidget::deleteRequested, this, &MainWindow::reorganizeTimerWidgets);
+        mainLayout->addWidget(w, curRow, curColumn);
         timers.push_back(t);
 
         ++curColumn;
@@ -126,8 +93,10 @@ bool MainWindow::loadFromFile() {
 }
 
 void MainWindow::reorganizeTimerWidgets(TimerWidget* toBeDeleted) {
-    leftLayout->removeWidget(toBeDeleted);
+    mainLayout->removeWidget(toBeDeleted);
     toBeDeleted->deleteLater();
+    std::string children = std::to_string(centralWidget()->findChild<QObject>("mainLayoutWidget").children().size());
+    QMessageBox::information(this, "test", QString::fromStdString(children));
 }
 
 MainWindow::~MainWindow() = default;

@@ -27,21 +27,21 @@ public:
     ~TimerWidget() override;
     QString secondsToQString(int seconds) const;
     Timer getTimer() const;
-signals:
-    void deleteRequested(TimerWidget* toBeDeleted);
+// signals:
+    // void deleteRequested(TimerWidget* toBeDeleted);
 private:
     Timer timer;
     QTimer *qTimer;
 
     QLabel *timerDurationLabel;
 
-    QPushButton *deleteButton;
+    // QPushButton *deleteButton;
     QPushButton *startButton;
     QPushButton *resetButton;
 
     void startButtonToggled(bool checked = false);
     void resetButtonClicked(bool checked = false);
-    void deleteButtonClicked(bool checked = false);
+    // void deleteButtonClicked(bool checked = false);
     void tick();
 };
 #endif // TIMER_WIDGET_H

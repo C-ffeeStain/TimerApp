@@ -27,16 +27,16 @@ TimerWidget::TimerWidget(const Timer timer, QWidget *parent) : QWidget(parent)
     timerNameLabel->setText(QString::fromStdString(timer.name));
     timerNameLabel->setMaximumHeight(25);
 
-    deleteButton = new QPushButton;
-    deleteButton->setText("X");
-    deleteButton->setStyleSheet("QPushButton {border: none; background: transparent;}");
-    deleteButton->setMaximumWidth(25);
-    deleteButton->setMaximumHeight(25);
-    QPushButton::connect(deleteButton, &QPushButton::clicked, this, &TimerWidget::deleteButtonClicked);
+    // deleteButton = new QPushButton;
+    // deleteButton->setText("X");
+    // deleteButton->setStyleSheet("QPushButton {border: none; background: transparent;}");
+    // deleteButton->setMaximumWidth(25);
+    // deleteButton->setMaximumHeight(25);
+    // QPushButton::connect(deleteButton, &QPushButton::clicked, this, &TimerWidget::deleteButtonClicked);
 
     QHBoxLayout *headerLayout = new QHBoxLayout;
     headerLayout->addWidget(timerNameLabel);
-    headerLayout->addWidget(deleteButton);
+    // headerLayout->addWidget(deleteButton);
 
     // button layout
 
@@ -65,11 +65,6 @@ TimerWidget::TimerWidget(const Timer timer, QWidget *parent) : QWidget(parent)
     layout->addWidget(timerDurationLabel);
     layout->addLayout(buttonLayout);
     setLayout(layout);
-
-    resetButton->show();
-    deleteButton->show();
-    timerDurationLabel->show();
-    timerNameLabel->show();
 }
 
 QString TimerWidget::secondsToQString(int seconds) const {
@@ -109,7 +104,7 @@ void TimerWidget::resetButtonClicked(bool checked) {
     }
 }
 
-void TimerWidget::deleteButtonClicked(bool checked) { emit deleteRequested(this); }
+// void TimerWidget::deleteButtonClicked(bool checked) { emit deleteRequested(this); }
 
 void TimerWidget::tick() {
     if (timer.paused) return;
@@ -120,7 +115,7 @@ void TimerWidget::tick() {
         QMenu *menu = new QMenu("Timer Finished");
         icon.setContextMenu(menu);
         icon.show();
-        icon.showMessage("Timer Finished!", "Your timer has finished.");
+        icon.showMessage("Timer Finished!", QString::fromStdString("Your timer " + timer.name + " has finished."));
         return;
     }
     --timer.timeLeft;

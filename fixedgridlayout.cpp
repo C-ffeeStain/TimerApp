@@ -1,5 +1,5 @@
 #include "fixedgridlayout.h"
-#include <QWidget>;
+#include <QWidget>
 
 FixedGridLayout::FixedGridLayout(int maxRows, int maxColumns, LayoutMode layoutMode, QWidget* parent) : QGridLayout(parent) {
     this->maxRows = maxRows;
@@ -16,16 +16,16 @@ int FixedGridLayout::getMaxColumns() const {
     return maxColumns;
 }
 
-std::vector<QWidget*> FixedGridLayout::getLayoutChildren() {
+std::vector<TimerWidget*> FixedGridLayout::getLayoutChildren() {
     return layoutChildren;
 }
 
-void FixedGridLayout::refresh(QWidget *removedElement) {
+void FixedGridLayout::refresh(TimerWidget *removedElement) {
     currentColumn = 0;
     currentRow = 0;
 
-    std::vector<QWidget*> newLayoutChildren;
-    foreach (QWidget *widget, layoutChildren) {
+    std::vector<TimerWidget*> newLayoutChildren;
+    foreach (TimerWidget *widget, layoutChildren) {
         if (widget == nullptr) continue;
         if (removedElement != nullptr && removedElement == widget) continue;
 
@@ -38,16 +38,29 @@ void FixedGridLayout::refresh(QWidget *removedElement) {
     layoutChildren.swap(newLayoutChildren);
 }
 
-void FixedGridLayout::addWidgetToEnd(QWidget* widget) {
+void FixedGridLayout::addWidget(TimerWidget *widget, int row, int column, Qt::Alignment alignment) {
     if (layoutChildren.size() == maxRows * maxColumns) {
         throw std::runtime_error("Could not add widget, already at max capacity");
         return; // is this necessary?
     }
 
-    QWidget::connect(widget, &QWidget::destroyed, this, &FixedGridLayout::onChildDestroyed);
-    addWidget(widget, currentRow, currentColumn);
+    TimerWidget::connect(widget, &TimerWidget::deleteRequested, this, &FixedGridLayout::onChildDestroyed);
+
+    QGridLayout::addWidget(widget, row, column, alignment);
+
+    if (row == currentRow && column == currentColumn) {
+        layoutChildren.push_back(widget);
+    } else if (layoutMode == LayoutMode::ColumnsFirst) {
+        layoutChildren.insert(layoutChildren.begin() + (row * 3) + column, widget);
+    } else {
+        layoutChildren.insert(layoutChildren.begin() + (column * 3) + row, widget);
+    }
+
     incrementPosition();
-    layoutChildren.push_back(widget);
+}
+
+void FixedGridLayout::addWidgetToEnd(TimerWidget* widget) {
+    addWidget(widget, currentRow, currentColumn);
 }
 
 void FixedGridLayout::incrementPosition() {
@@ -66,6 +79,10 @@ void FixedGridLayout::incrementPosition() {
     }
 }
 void FixedGridLayout::onChildDestroyed(QObject *obj) {
-    emit childDestroyed((QWidget*)obj);
-    refresh();
+    TimerWidget *widget = (TimerWidget*)obj;
+    TimerWidget::disconnect(widget, &TimerWidget::destroyed, this, &FixedGridLayout::onChildDestroyed);
+
+    refresh(widget);
+    obj->deleteLater();
+    emit childDestroyed(widget);
 }
