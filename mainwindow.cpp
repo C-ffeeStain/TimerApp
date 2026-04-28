@@ -68,6 +68,7 @@ bool MainWindow::loadFromFile() {
 
     std::ifstream input(timersFilePath + "\\timers.txt");
     std::string curLine;
+    QWidget* central = centralWidget();
     while (!input.eof()) {
         std::getline(input, curLine, '\n');
         int splitter_index = curLine.find('|');
@@ -79,8 +80,9 @@ bool MainWindow::loadFromFile() {
 
         Timer t(name, std::stoi(curLine.substr(splitter_index + 1)));
         TimerWidget *w = new TimerWidget(t);
-        // TimerWidget::connect(w, &TimerWidget::deleteRequested, this, &MainWindow::reorganizeTimerWidgets);
+        TimerWidget::connect(w, &TimerWidget::deleteRequested, this, &MainWindow::reorganizeTimerWidgets);
         mainLayout->addWidget(w, curRow, curColumn);
+        w->setParent(central);
         timers.push_back(t);
 
         ++curColumn;
@@ -93,10 +95,38 @@ bool MainWindow::loadFromFile() {
 }
 
 void MainWindow::reorganizeTimerWidgets(TimerWidget* toBeDeleted) {
-    mainLayout->removeWidget(toBeDeleted);
-    toBeDeleted->deleteLater();
-    std::string children = std::to_string(centralWidget()->findChild<QObject>("mainLayoutWidget").children().size());
-    QMessageBox::information(this, "test", QString::fromStdString(children));
+    int timerToRemove = -1;
+    for (int i = 0; i < timers.size(); ++i) {
+        if (timers.at(i) == toBeDeleted->getTimer()) timerToRemove = i;
+    }
+    if (timerToRemove != -1) timers.erase(timers.begin() + timerToRemove);
+
+    centralWidget()->deleteLater();
+
+    mainLayout = new QGridLayout;
+
+    QWidget *window = new QWidget();
+    window->setLayout(mainLayout);
+
+    // Set QWidget as the central layout of the main window
+    setCentralWidget(window);
+
+    curRow = 0;
+    curColumn = 0;
+
+
+    foreach (Timer timer, timers) {
+        TimerWidget *w = new TimerWidget(timer);
+        TimerWidget::connect(w, &TimerWidget::deleteRequested, this, &MainWindow::reorganizeTimerWidgets);
+        mainLayout->addWidget(w, curRow, curColumn);
+        w->setParent(window);
+
+        ++curColumn;
+        if (curColumn >= MAX_COLUMNS) {
+            ++curRow;
+            curColumn = 0;
+        }
+    }
 }
 
 MainWindow::~MainWindow() = default;

@@ -10,7 +10,7 @@ qt_add_executable(TimerApp
     main.cpp
     mainwindow.cpp
     mainwindow.h
-    delete.ui
+
     timer_widget.h
     timer_widget.cpp
 
