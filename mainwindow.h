@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QLineEdit>
 #include <QGridLayout>
+#include <QFormLayout>
 
 class MainWindow : public QMainWindow
 {
@@ -26,7 +27,13 @@ private:
 
     std::vector<Timer> timers;
 
-    QGridLayout *mainLayout;
+    QHBoxLayout *mainLayout;
+    QGridLayout *leftLayout;
+    QWidget *leftLayoutWidget;
+    QFormLayout *rightLayout;
+
+    QLineEdit *newTimerName;
+    QLineEdit *newTimerDuration;
 
     void reorganizeTimerWidgets(TimerWidget* toBeDeleted);
 };

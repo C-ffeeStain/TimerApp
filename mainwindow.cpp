@@ -1,13 +1,5 @@
 #include "mainwindow.h"
 
-#include <QFormLayout>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QLabel>
-
 #include <fstream>
 #include <filesystem>
 #include <iostream>
@@ -16,11 +8,30 @@ const int MAX_COLUMNS = 3;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
+    setMinimumSize(600, 600);
     // creating the entire UI manually because Qt Creator sucks
     setupFilePath();
 
-    mainLayout = new QGridLayout;
+    newTimerName = new QLineEdit;
+    newTimerDuration = new QLineEdit;
 
+    rightLayout = new QFormLayout;
+    rightLayout->addRow("Timer name:", newTimerName);
+    rightLayout->addRow("Timer duration (seconds): ", newTimerDuration);
+
+    QWidget* rightLayoutWidget = new QWidget;
+    rightLayoutWidget->setMaximumWidth(280);
+    rightLayoutWidget->setLayout(rightLayout);
+
+    leftLayout = new QGridLayout;
+    leftLayout->setSpacing(10);
+
+    leftLayoutWidget = new QWidget;
+    leftLayoutWidget->setLayout(leftLayout);
+
+    mainLayout = new QHBoxLayout;
+    mainLayout->addWidget(leftLayoutWidget);
+    mainLayout->addWidget(rightLayoutWidget);
 
     QWidget *window = new QWidget();
     window->setLayout(mainLayout);
@@ -81,8 +92,8 @@ bool MainWindow::loadFromFile() {
         Timer t(name, std::stoi(curLine.substr(splitter_index + 1)));
         TimerWidget *w = new TimerWidget(t);
         TimerWidget::connect(w, &TimerWidget::deleteRequested, this, &MainWindow::reorganizeTimerWidgets);
-        mainLayout->addWidget(w, curRow, curColumn);
-        w->setParent(central);
+        leftLayout->addWidget(w, curRow, curColumn);
+        w->setParent(leftLayoutWidget);
         timers.push_back(t);
 
         ++curColumn;
@@ -101,9 +112,27 @@ void MainWindow::reorganizeTimerWidgets(TimerWidget* toBeDeleted) {
     }
     if (timerToRemove != -1) timers.erase(timers.begin() + timerToRemove);
 
-    centralWidget()->deleteLater();
+    leftLayoutWidget->deleteLater();
 
-    mainLayout = new QGridLayout;
+    newTimerName = new QLineEdit;
+    newTimerDuration = new QLineEdit;
+
+    rightLayout = new QFormLayout;
+    rightLayout->addRow("Timer name:", newTimerName);
+    rightLayout->addRow("Timer duration (seconds): ", newTimerDuration);
+
+    QWidget* rightLayoutWidget = new QWidget;
+    rightLayoutWidget->setMaximumWidth(280);
+    rightLayoutWidget->setLayout(rightLayout);
+
+    leftLayout = new QGridLayout;
+
+    leftLayoutWidget = new QWidget;
+    leftLayoutWidget->setLayout(leftLayout);
+
+    mainLayout = new QHBoxLayout;
+    mainLayout->addWidget(leftLayoutWidget);
+    mainLayout->addWidget(rightLayoutWidget);
 
     QWidget *window = new QWidget();
     window->setLayout(mainLayout);
@@ -118,8 +147,8 @@ void MainWindow::reorganizeTimerWidgets(TimerWidget* toBeDeleted) {
     foreach (Timer timer, timers) {
         TimerWidget *w = new TimerWidget(timer);
         TimerWidget::connect(w, &TimerWidget::deleteRequested, this, &MainWindow::reorganizeTimerWidgets);
-        mainLayout->addWidget(w, curRow, curColumn);
-        w->setParent(window);
+        leftLayout->addWidget(w, curRow, curColumn);
+        w->setParent(leftLayoutWidget);
 
         ++curColumn;
         if (curColumn >= MAX_COLUMNS) {
