@@ -16,6 +16,8 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
+    void setupUi();
+
     void setupFilePath();
     bool saveToFile();
     bool loadFromFile();
@@ -36,5 +38,6 @@ private:
     QLineEdit *newTimerDuration;
 
     void reorganizeTimerWidgets(TimerWidget* toBeDeleted);
+    void addTimerButtonClicked(bool checked = false);
 };
 #endif // MAINWINDOW_H
