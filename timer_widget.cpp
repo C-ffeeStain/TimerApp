@@ -58,7 +58,7 @@ TimerWidget::TimerWidget(const Timer timer, QWidget *parent) : QWidget(parent)
     timerDurationLabel = new QLabel;
     timerDurationLabel->setText(secondsToQString(timer.duration));
     timerDurationLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    timerDurationLabel->setStyleSheet("QLabel{\nfont-size: 35pt;\ncolor: white;\n}");
+    timerDurationLabel->setStyleSheet("QLabel{\nfont-size: 35pt;\n}");
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(headerLayout);
