@@ -19,7 +19,7 @@ struct Timer {
     bool operator==(Timer other);
 };
 
-class TimerWidget : public QWidget
+class TimerWidget : public QFrame
 {
     Q_OBJECT
 

@@ -10,9 +10,10 @@
 Timer::Timer() : name("Unnamed"), duration(30) {};
 Timer::Timer(std::string name, int duration) : name(name), duration(duration) {};
 
-TimerWidget::TimerWidget(const Timer timer, QWidget *parent) : QWidget(parent)
+TimerWidget::TimerWidget(const Timer timer, QWidget *parent) : QFrame(parent)
 {
     setMaximumSize(250, 200);
+    setStyleSheet("TimerWidget {border: 1px solid white; padding: 5px; border-radius: 10px}");
 
     qTimer = new QTimer;
     this->timer = timer;
